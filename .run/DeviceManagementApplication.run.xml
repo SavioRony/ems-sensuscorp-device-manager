@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DeviceManagementApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="com.sensuscorp.device_management.DeviceManagementApplication" />
+    <module name="device-manager.main" />
+    <option name="PROGRAM_PARAMETERS" value="-XX:MaxRAM=256m" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/microservices/device-manager" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.sensuscorp.device_management.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
