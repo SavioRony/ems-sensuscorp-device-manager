@@ -6,7 +6,7 @@
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/microservices/device-manager" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="com.sensuscorp.device_management.*" />
+        <option name="PATTERN" value="com.sensuscorp.device_management.common.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
