@@ -1,6 +1,7 @@
 package com.sensuscorp.device_management.api.controller;
 
 import com.sensuscorp.device_management.api.model.SensorInput;
+import com.sensuscorp.device_management.api.model.SensorOutput;
 import com.sensuscorp.device_management.common.IdGenerator;
 import com.sensuscorp.device_management.domain.model.Sensor;
 import com.sensuscorp.device_management.domain.model.SensorId;
@@ -18,7 +19,7 @@ public class SesorController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Sensor create(@RequestBody SensorInput input){
+    public SensorOutput create(@RequestBody SensorInput input){
         Sensor sensor = Sensor.builder()
                 .id(new SensorId(IdGenerator.generateTSID()))
                 .name(input.getName())
@@ -29,6 +30,15 @@ public class SesorController {
                 .enable(false)
                 .build();
 
-        return sensorRepository.save(sensor);
+        Sensor sensorSaved = sensorRepository.save(sensor);
+        return SensorOutput.builder()
+                .id(sensorSaved.getId().getValue())
+                .name(sensorSaved.getName())
+                .ip(sensorSaved.getIp())
+                .location(sensorSaved.getLocation())
+                .protocol(sensorSaved.getProtocol())
+                .model(sensorSaved.getModel())
+                .enable(sensorSaved.getEnable())
+                .build();
     }
 }
