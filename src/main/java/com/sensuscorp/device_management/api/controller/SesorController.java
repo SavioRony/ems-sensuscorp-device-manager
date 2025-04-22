@@ -1,6 +1,7 @@
 package com.sensuscorp.device_management.api.controller;
 
 import com.sensuscorp.device_management.api.model.SensorInput;
+import com.sensuscorp.device_management.api.model.SensorInputUpdate;
 import com.sensuscorp.device_management.api.model.SensorOutput;
 import com.sensuscorp.device_management.common.IdGenerator;
 import com.sensuscorp.device_management.domain.model.Sensor;
@@ -35,6 +36,33 @@ public class SesorController {
         return convertToModel(sensor);
     }
 
+    @DeleteMapping("/{sensorId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable TSID sensorId){
+        SensorId sensorId1 = new SensorId(sensorId);
+        existsById(sensorId1);
+        sensorRepository.deleteById(sensorId1);
+    }
+
+    @DeleteMapping("/{sensorId}/enable")
+    @ResponseStatus(HttpStatus.OK)
+    public SensorOutput disable(@PathVariable TSID sensorId){
+        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        sensor.setEnabled(false);
+        return convertToModel(sensorRepository.save(sensor));
+    }
+
+    @PutMapping("/{sensorId}/enable")
+    @ResponseStatus(HttpStatus.OK)
+    public SensorOutput enabledSensor(@PathVariable TSID sensorId){
+        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        sensor.setEnabled(true);
+        return convertToModel(sensorRepository.save(sensor));
+    }
+
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public SensorOutput create(@RequestBody SensorInput input){
@@ -45,22 +73,48 @@ public class SesorController {
                 .location(input.getLocation())
                 .protocol(input.getProtocol())
                 .model(input.getModel())
-                .enable(false)
+                .enabled(false)
                 .build();
 
         Sensor sensorSaved = sensorRepository.save(sensor);
         return convertToModel(sensorSaved);
     }
 
-    private SensorOutput convertToModel(Sensor sensorSaved) {
+    @PutMapping("/{sensorId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SensorOutput update(@PathVariable TSID sensorId, @RequestBody SensorInputUpdate input){
+
+        existsById(new SensorId(sensorId));
+
+        Sensor sensorUpdate = Sensor.builder()
+                .id(new SensorId(sensorId))
+                .name(input.getName())
+                .ip(input.getIp())
+                .location(input.getLocation())
+                .protocol(input.getProtocol())
+                .model(input.getModel())
+                .enabled(input.getEnabled())
+                .build();
+
+        return convertToModel(sensorRepository.save(sensorUpdate));
+    }
+
+    private void existsById(SensorId sensorId) {
+        boolean exists = sensorRepository.existsById(sensorId);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    private SensorOutput convertToModel(Sensor sensor) {
         return SensorOutput.builder()
-                .id(sensorSaved.getId().getValue())
-                .name(sensorSaved.getName())
-                .ip(sensorSaved.getIp())
-                .location(sensorSaved.getLocation())
-                .protocol(sensorSaved.getProtocol())
-                .model(sensorSaved.getModel())
-                .enable(sensorSaved.getEnable())
+                .id(sensor.getId().getValue())
+                .name(sensor.getName())
+                .ip(sensor.getIp())
+                .location(sensor.getLocation())
+                .protocol(sensor.getProtocol())
+                .model(sensor.getModel())
+                .enabled(sensor.getEnabled())
                 .build();
     }
 }

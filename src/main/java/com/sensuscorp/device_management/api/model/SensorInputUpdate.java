@@ -1,13 +1,9 @@
 package com.sensuscorp.device_management.api.model;
 
-import io.hypersistence.tsid.TSID;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
-public class SensorOutput {
-    private TSID id;
+public class SensorInputUpdate {
     private String name;
     private String ip;
     private String location;
