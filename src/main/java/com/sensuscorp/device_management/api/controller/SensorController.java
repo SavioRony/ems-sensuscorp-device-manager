@@ -1,5 +1,6 @@
 package com.sensuscorp.device_management.api.controller;
 
+import com.sensuscorp.device_management.api.client.SensorMonitoringClient;
 import com.sensuscorp.device_management.api.model.SensorInput;
 import com.sensuscorp.device_management.api.model.SensorInputUpdate;
 import com.sensuscorp.device_management.api.model.SensorOutput;
@@ -19,9 +20,10 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/api/sensors")
 @RequiredArgsConstructor
-public class SesorController {
+public class SensorController {
 
     private final SensorRepository sensorRepository;
+    private final SensorMonitoringClient sensorMonitoringClient;
 
     @GetMapping
     public Page<SensorOutput> search(@PageableDefault Pageable pageable){
@@ -42,6 +44,7 @@ public class SesorController {
         SensorId sensorId1 = new SensorId(sensorId);
         existsById(sensorId1);
         sensorRepository.deleteById(sensorId1);
+        sensorMonitoringClient.disableMonitoring(sensorId);
     }
 
     @DeleteMapping("/{sensorId}/enable")
@@ -50,7 +53,9 @@ public class SesorController {
         Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         sensor.setEnabled(false);
-        return convertToModel(sensorRepository.save(sensor));
+        SensorOutput sensorOutput = convertToModel(sensorRepository.save(sensor));
+        sensorMonitoringClient.disableMonitoring(sensorId);
+        return sensorOutput;
     }
 
     @PutMapping("/{sensorId}/enable")
@@ -59,7 +64,9 @@ public class SesorController {
         Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         sensor.setEnabled(true);
-        return convertToModel(sensorRepository.save(sensor));
+        SensorOutput sensorOutput = convertToModel(sensorRepository.save(sensor));
+        sensorMonitoringClient.enableMonitoring(sensorId);
+        return sensorOutput;
     }
 
 
