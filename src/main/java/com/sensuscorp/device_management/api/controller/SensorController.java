@@ -1,9 +1,7 @@
 package com.sensuscorp.device_management.api.controller;
 
 import com.sensuscorp.device_management.api.client.SensorMonitoringClient;
-import com.sensuscorp.device_management.api.model.SensorInput;
-import com.sensuscorp.device_management.api.model.SensorInputUpdate;
-import com.sensuscorp.device_management.api.model.SensorOutput;
+import com.sensuscorp.device_management.api.model.*;
 import com.sensuscorp.device_management.common.IdGenerator;
 import com.sensuscorp.device_management.domain.model.Sensor;
 import com.sensuscorp.device_management.domain.model.SensorId;
@@ -37,6 +35,19 @@ public class SensorController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return convertToModel(sensor);
     }
+
+    @GetMapping("/{sensorId}/detail")
+    public SensorDetailOutput getOneWithDetail(@PathVariable TSID sensorId){
+        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        SensorMonitoringOutput monitoring = sensorMonitoringClient.getDetail(sensorId);
+        return SensorDetailOutput.builder()
+                .sensor(convertToModel(sensor))
+                .monitoring(monitoring)
+                .build();
+    }
+
 
     @DeleteMapping("/{sensorId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
